@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Support Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+        h1 { text-align: center; }
+        #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+        .user { font-weight: bold; color: blue; }
+        .bot { font-weight: bold; color: green; }
+        input[type="text"] { width: 80%; padding: 10px; }
+        button { padding: 10px 15px; }
+    </style>
+</head>
+<body>
+    <h1>Customer Support Chatbot</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="Type your question..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById("user-input");
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<div class='user'>You: ${message}</div>`;
+
+            fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatBox.innerHTML += `<div class='bot'>Bot: ${data.response} (Confidence: ${data.confidence.toFixed(2)})</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+
+            input.value = "";
+        }
+    </script>
+</body>
+</html>
